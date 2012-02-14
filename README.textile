@@ -5,15 +5,17 @@ group this gem will configure for default pipeline and a simple test stage
 
 h2. Installation
 
-  $ [sudo] gem install go_figure
+<pre>$ [sudo] gem install go_figure</pre>
 
 h2. Usage
 
-  require 'go_figure'
-  endpoint = GoFigure::GoConfigEndpoint.new(:host => 'example.com', :port => 8153)
-  config = endpoint.get_config
-  config.set_pipeline('http://github.com/user/repo.git', 'rails_working_dir')
-  endpoint.update_config(config)
+<pre>
+ require 'go_figure'
+ endpoint = GoFigure::GoConfigEndpoint.new(:host => 'example.com', :port => 8153)
+ config = endpoint.get_config
+ config.set_pipeline('http://github.com/user/repo.git', 'rails_working_dir')
+ endpoint.update_config(config)
+</pre>
 
 h2. License
 
