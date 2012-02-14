@@ -12,7 +12,7 @@ module GoFigure
       @doc = Nokogiri.XML(@original_xml, nil, 'utf-8')
     end
 
-    def add_pipeline(git_url, working_dir)
+    def set_pipeline(git_url, working_dir)
       @doc.root.xpath('pipelines').remove
       agents = @doc.root.xpath('agents')
 

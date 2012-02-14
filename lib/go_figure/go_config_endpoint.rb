@@ -16,7 +16,7 @@ module GoFigure
       end
     end
 
-    def get
+    def get_config
       response = http_fetcher.get(config_xml_url)
       if response.status == 200
         return GoConfig.new(:md5 => response['X-CRUISE-CONFIG-MD5'], :xml => response.body)
@@ -25,7 +25,7 @@ module GoFigure
       end
     end
 
-    def post(go_config)
+    def update_config(go_config)
       http_fetcher.post(config_xml_url, :xmlFile => go_config.xml_content, :md5 => go_config.original_md5)
     end
 
