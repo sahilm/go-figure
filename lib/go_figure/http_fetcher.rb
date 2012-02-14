@@ -1,7 +1,7 @@
 require 'net/http'
 require 'net/https'
 
-module UserImport
+module GoFigure
   class HttpFetcher
 
     def fetch(url, user, pass)
