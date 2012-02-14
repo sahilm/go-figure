@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:say="com.thoughtworks.cruise.task.plugin.say" xsi:noNamespaceSchemaLocation="cruise-config.xsd" xsi:schemaLocation="com.thoughtworks.cruise.task.plugin.say bundle://1.0:1/say-config.xsd" schemaVersion="52">
+  <pipelines group="defaultGroup1">
+    <pipeline name="MyPipeline">
+      <materials>
+        <git url="git@go-saas.github.com:ThoughtWorksInc/go-saas.git" />
+      </materials>
+      <stage name="Units">
+        <jobs>
+          <job name="UnitTest">
+            <tasks>
+              <exec command="bundle" workingdir="rails">
+                <arg>install</arg>
+                <arg>--local</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bundle" workingdir="rails">
+                <arg>exec</arg>
+                <arg>rake</arg>
+                <arg>db:create</arg>
+                <arg>db:migrate</arg>
+                <runif status="passed" />
+              </exec>
+              <rake workingdir="rails" />
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+  <agents>
+    <agent hostname="ika.corporate.thoughtworks.com" ipaddress="10.12.1.229" uuid="de494931-c26c-44ef-a94d-8835166a3e88" />
+  </agents>
+</cruise>
+
