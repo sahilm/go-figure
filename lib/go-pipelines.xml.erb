@@ -1,0 +1,32 @@
+<pipelines group="defaultGroup">
+  <pipeline name="defaultPipeline">
+    <materials>
+      <git url="<%= @git_url %>" />
+    </materials>
+    <stage name="Units">
+      <jobs>
+        <job name="Test">
+          <tasks>
+            <exec command="bundle" workingdir="<%= @working_dir %>">
+              <arg>install</arg>
+              <arg>--local</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bundle" workingdir="<%= @working_dir %>">
+              <arg>exec</arg>
+              <arg>rake</arg>
+              <arg>db:create</arg>
+              <arg>db:migrate</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bundle" workingdir="<%= @working_dir %>">
+              <arg>exec</arg>
+              <arg>rake</arg>
+              <runif status="passed" />
+            </exec>
+          </tasks>
+        </job>
+      </jobs>
+    </stage>
+  </pipeline>
+</pipelines>

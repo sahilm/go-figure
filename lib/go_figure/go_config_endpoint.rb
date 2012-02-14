@@ -19,12 +19,14 @@ module GoFigure
     def get
       response = http_fetcher.get(config_xml_url)
       if response.status == 200
-        GoConfig.new(:md5 => response['X-CRUISE-CONFIG-MD5'], :xml => response.body)
+        return GoConfig.new(:md5 => response['X-CRUISE-CONFIG-MD5'], :xml => response.body)
+      else
+        raise "Could not fetch the go config file"
       end
     end
 
     def post(go_config)
-      http_fetcher.post(config_xml_url, :xmlFile => go_config.xml, :md5 => go_config.original_md5)
+      http_fetcher.post(config_xml_url, :xmlFile => go_config.xml_content, :md5 => go_config.original_md5)
     end
 
     def http_fetcher

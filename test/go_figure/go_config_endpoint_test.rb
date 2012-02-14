@@ -20,11 +20,12 @@ module GoFigure
       fetcher.http_fetcher = fetcher_with_config_file('foo.xml', md5, config_endpoint)
 
       config = fetcher.get
-      config.xml = "<new xml content/>"
+      config.add_pipeline("http://git.example.com/foo/bar.git", "my_rails_app")
 
-      fetcher.http_fetcher.register_content("OK", config_endpoint, :post, :md5 => config.original_md5, :xmlFile => config.xml)
+      fetcher.http_fetcher.register_content("OK", config_endpoint, :post, :md5 => config.original_md5, :xmlFile => config.xml_content)
+
       fetcher.post(config)
-      assert fetcher.http_fetcher.invoked?(config_endpoint, :post, :md5 => config.original_md5, :xmlFile => config.xml)
+      assert fetcher.http_fetcher.invoked?(config_endpoint, :post, :md5 => config.original_md5, :xmlFile => config.xml_content)
     end
 
     def config_endpoint
