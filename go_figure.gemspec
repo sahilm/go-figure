@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = GoFigure::VERSION
   s.authors     = ["Ketan Padegaonkar"]
   s.email       = ["KetanPadegaonkar@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/ThoughtWorksInc/go-figure"
   s.summary     = %q{A Ruby DSL to write a configuration file for the a go server.}
   s.description = %q{This provides a ruby DSL to create a configuration file for the go server (thoughtworks-studios.com/go)}
 
@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
-  
 
   # specify any dependencies here; for example:
   # s.add_development_dependency "rspec"
