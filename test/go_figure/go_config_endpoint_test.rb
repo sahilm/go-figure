@@ -7,7 +7,7 @@ module GoFigure
     def test_should_fetch_xml_config_on_localhost
       md5 = '7455edff001e2f262beb7c13f10ff7cb'
       endpoint = GoConfigEndpoint.new(:host => 'example.com', :port => 1234)
-      endpoint.http_fetcher = fetcher_with_config_file('foo.xml', md5, config_endpoint)
+      GoConfigEndpoint.http_fetcher = fetcher_with_config_file('foo.xml', md5, config_endpoint)
 
       config = endpoint.get_config
       assert_equal config_file('foo.xml'), config.original_xml
@@ -17,7 +17,7 @@ module GoFigure
     def test_should_post_back_new_config_xml_content_with_original_md5
       md5 = '7455edff001e2f262beb7c13f10ff7cb'
       endpoint = GoConfigEndpoint.new(:host => 'example.com', :port => 1234)
-      endpoint.http_fetcher = fetcher_with_config_file('foo.xml', md5, config_endpoint)
+      GoConfigEndpoint.http_fetcher = fetcher_with_config_file('foo.xml', md5, config_endpoint)
 
       config = endpoint.get_config
       config.set_pipeline("http://git.example.com/foo/bar.git", "my_rails_app")

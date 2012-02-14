@@ -8,7 +8,17 @@ module GoFigure
     }
 
     attr_accessor *DEFAULT_OPTIONS.keys
-    attr_accessor :http_fetcher
+    @@http_fetcher = nil
+
+    class << self
+      def http_fetcher=(fetcher)
+        @@http_fetcher = fetcher
+      end
+
+      def http_fetcher
+        @@http_fetcher ||= GoFigure::HttpFetcher.new
+      end
+    end
 
     def initialize(options={})
       DEFAULT_OPTIONS.each do |k, v|
@@ -30,7 +40,7 @@ module GoFigure
     end
 
     def http_fetcher
-      @http_fetcher || HttpFetcher.new
+      self.class.http_fetcher
     end
 
     private
