@@ -20,14 +20,14 @@ module GoFigure
 
     class StringResponse
       include Response
-      def initialize(content, status = 200, headers = {})
+      def initialize(content, code = 200, headers = {})
         @content = content
-        @status = 200
+        @code = code.to_s
         @headers = headers
       end
 
       def execute
-        HashStruct.new(:body => @content, :status => @status, :headers => @headers)
+        HashStruct.new(:body => @content, :code => @code, :headers => @headers)
       end
 
     end

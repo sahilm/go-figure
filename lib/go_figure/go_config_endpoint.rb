@@ -10,7 +10,7 @@ module GoFigure
     attr_accessor *DEFAULT_OPTIONS.keys
     attr_accessor :http_fetcher
 
-    def initialize(options)
+    def initialize(options={})
       DEFAULT_OPTIONS.each do |k, v|
         self.send("#{k}=", options[k] || v)
       end
@@ -18,7 +18,7 @@ module GoFigure
 
     def get_config
       response = http_fetcher.get(config_xml_url)
-      if response.status == 200
+      if response.code == '200'
         return GoConfig.new(:md5 => response['X-CRUISE-CONFIG-MD5'], :xml => response.body)
       else
         raise "Could not fetch the go config file"
