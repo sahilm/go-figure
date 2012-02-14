@@ -3,19 +3,17 @@ h2. Go Figure Gem
 This gem generates configuration for Go server - basically given a stage/pipeline 
 group this gem will configure for default pipeline and a simple test stage
 
-
 h2. Installation
 
-<code>$ [sudo] gem install go_figure</code>
+  $ [sudo] gem install go_figure
 
-h2. Configuration
+h2. Usage
 
-No configuration required, this gem is invoked manually, over ssh or via mcollective
-
-h2. Execute
-
-<code>$ go-figure [server] </code>
-
+  require 'go_figure'
+  endpoint = GoFigure::GoConfigEndpoint.new(:host => 'example.com', :port => 8153)
+  config = endpoint.get_config
+  config.set_pipeline('http://github.com/user/repo.git', 'rails_working_dir')
+  endpoint.update_config(config)
 
 h2. License
 
@@ -42,3 +40,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
