@@ -10,6 +10,8 @@
             <exec command="bundle" workingdir="<%= @working_dir %>">
               <arg>install</arg>
               <arg>--local</arg>
+              <arg>--path</arg>
+              <arg>.bundle</arg>
               <runif status="passed" />
             </exec>
             <exec command="bundle" workingdir="<%= @working_dir %>">
