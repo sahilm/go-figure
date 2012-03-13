@@ -5,8 +5,8 @@ require "go_figure/version"
 Gem::Specification.new do |s|
   s.name        = "go_figure"
   s.version     = GoFigure::VERSION
-  s.authors     = ["Ketan Padegaonkar"]
-  s.email       = ["KetanPadegaonkar@gmail.com"]
+  s.authors     = ["Nikhil Mungel", "Ketan Padegaonkar", "Shishir Das"]
+  s.email       = ["hyfather@gmail.com", "KetanPadegaonkar@gmail.com", "shishir.das@gmail.com"]
   s.homepage    = "https://github.com/ThoughtWorksInc/go-figure"
   s.summary     = %q{A Ruby DSL to write a configuration file for the a go server.}
   s.description = %q{This provides a ruby DSL to create a configuration file for the go server (thoughtworks-studios.com/go)}
