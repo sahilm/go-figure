@@ -1,7 +1,7 @@
 <pipelines group="defaultGroup">
   <pipeline name="defaultPipeline">
     <materials>
-      <git url="<%= @git_url %>" />
+      <git autoUpdate="false" url="<%= @git_url %>" />
     </materials>
     <stage name="Units">
       <jobs>
