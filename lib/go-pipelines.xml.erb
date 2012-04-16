@@ -7,21 +7,21 @@
       <jobs>
         <job name="Test">
           <tasks>
-            <exec command="bundle" <%= %Q{workingdir="#{@working_dir}"} if @workingdir %>>
+            <exec command="bundle">
               <arg>install</arg>
               <arg>--local</arg>
               <arg>--path</arg>
               <arg>.bundle</arg>
               <runif status="passed" />
             </exec>
-            <exec command="bundle" <%= %Q{workingdir="#{@working_dir}"} if @workingdir %>>
+            <exec command="bundle">
               <arg>exec</arg>
               <arg>rake</arg>
               <arg>db:create</arg>
               <arg>db:migrate</arg>
               <runif status="passed" />
             </exec>
-            <exec command="bundle" <%= %Q{workingdir="#{@working_dir}"} if @workingdir %>>
+            <exec command="bundle">
               <arg>exec</arg>
               <arg>rake</arg>
               <runif status="passed" />

@@ -25,6 +25,13 @@ module GoFigure
       @doc = Nokogiri.XML(@doc.to_s) do |config|
         config.default_xml.noblanks
       end
+
+      puts "************************************"
+      puts "Set new pipeline:"
+      puts xml_content
+      puts "************************************"
+
+      @doc
     end
 
     def pipeline_template(git_url, working_dir)
