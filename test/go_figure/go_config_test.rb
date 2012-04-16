@@ -48,7 +48,7 @@ module GoFigure
       config = GoConfig.new(:xml => xml)
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
       assert config.xml_content =~ %r{<pipelines group="defaultGroup">}
-      assert config.xml_content =~ %r{<git url="http://git.example.com/my_project/atlas.git"/>}
+      assert config.xml_content =~ %r{<git autoUpdate="false" url="http://git.example.com/my_project/atlas.git"/>}
     end
 
   end
