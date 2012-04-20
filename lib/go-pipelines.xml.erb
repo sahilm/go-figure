@@ -7,6 +7,12 @@
       <jobs>
         <job name="Test">
           <tasks>
+            <exec command="/bin/ln">
+              <arg>-sf</arg>
+              <arg>/etc/go_saas/database.yml</arg>
+              <arg>config/database.yml</arg>
+              <runif status="passed" />
+            </exec>
             <exec command="bundle">
               <arg>install</arg>
               <arg>--local</arg>
@@ -21,11 +27,22 @@
               <arg>db:migrate</arg>
               <runif status="passed" />
             </exec>
+            <% if @params[:test_unit] %>
             <exec command="bundle">
               <arg>exec</arg>
               <arg>rake</arg>
+              <arg>test</arg>
               <runif status="passed" />
             </exec>
+            <%end%>
+            <% if @params[:rspec] %>
+            <exec command="bundle">
+              <arg>exec</arg>
+              <arg>rake</arg>
+              <arg>spec</arg>
+              <runif status="passed" />
+            </exec>
+            <%end%>
           </tasks>
         </job>
       </jobs>

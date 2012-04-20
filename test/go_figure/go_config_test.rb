@@ -43,6 +43,57 @@ module GoFigure
       }
     end
 
+    def test_should_set_the_rspec_pipeline_if_configured
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+
+      config = GoConfig.new(:xml => xml)
+      config.set_rspec
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content =~ /<arg>rake<\/arg>.\s*<arg>spec<\/arg>/m
+    end
+
+    def test_should_not_set_the_rspec_pipeline_if_not_configured
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+
+      config = GoConfig.new(:xml => xml)
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content !~ /<arg>rake<\/arg>.\s*<arg>spec<\/arg>/m
+    end
+
+    def test_should_set_the_test_unit_pipeline_if_configured
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+
+      config = GoConfig.new(:xml => xml)
+      config.set_test_unit
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content =~ /<arg>rake<\/arg>.\s*<arg>test<\/arg>/m
+    end
+
+    def test_should_not_set_the_test_unit_pipeline_if_not_configured
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+
+      config = GoConfig.new(:xml => xml)
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content !~ /<arg>rake<\/arg>.\s*<arg>test<\/arg>/m
+    end
+
+    def test_should_link_the_db_yml_to_a_controlled_db_yml
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+
+      config = GoConfig.new(:xml => xml)
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content =~ /<exec command="\/bin\/ln">.\s*<arg>-sf<\/arg>.\s*<arg>\/etc\/go_saas\/database.yml<\/arg>.\s*<arg>config\/database.yml<\/arg>/m
+    end
 
     def assert_pipeline_template(xml)
       config = GoConfig.new(:xml => xml)
