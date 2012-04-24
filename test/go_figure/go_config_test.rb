@@ -19,7 +19,7 @@ MSyuoIPAZhmk7osFKHdJ3wlGfEIQf2bhl+op7u/VZQ==</license>
 
       config = GoConfig.new(:xml => xml)
       config.set_auto_registration_key("foobar")
-      assert config.xml_content =~ /<server.*agentAutoRegistrationKey="foobar".*/
+      assert config.xml_content =~ /<server.*agentAutoRegisterKey="foobar".*/
     end
     
     def test_should_set_pipeline_in_a_config_file_with_no_pipelines_and_no_agents

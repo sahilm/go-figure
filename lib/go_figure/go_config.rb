@@ -14,7 +14,7 @@ module GoFigure
     end
 
     def set_auto_registration_key(key)
-      @doc.root.xpath('server').first["agentAutoRegistrationKey"] = key
+      @doc.root.xpath('server').first["agentAutoRegisterKey"] = key
     end
     
     def set_pipeline(git_url, working_dir)
