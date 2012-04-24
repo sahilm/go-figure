@@ -13,6 +13,10 @@ module GoFigure
       @params = {}
     end
 
+    def set_auto_registration_key(key)
+      @doc.root.xpath('server').first["agentAutoRegistrationKey"] = key
+    end
+    
     def set_pipeline(git_url, working_dir)
       @doc.root.xpath('pipelines').remove
       agents = @doc.root.xpath('agents')

@@ -3,6 +3,25 @@ require 'test_helper'
 module GoFigure
   class GoConfigTest < Test::Unit::TestCase
 
+    def test_should_set_agent_registration_key_on_the_server
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="41">
+  <server artifactsdir="artifacts">
+    <license user="IS team">GPXIhwIOEcByXG95ib4RMxIUn73G+BklnEn/Om+s/lHBCNhbboXsDufdjnom&#xD;
+7ZYFzs1hhlY1bRf044wu4y1pmKBe/E5OjA2TbK5PGm3pwOvzUYD/peudL5Gs&#xD;
+q+Ia8uD2PBf1bBhoEoYSy9JSs5zTIlNtSc+rCCYkZq+Sn2p0lRHOUzZ0bdkh&#xD;
+3K/dHYyA4PsB1FciCZCShTlJwyOhSrpQw4qpJ2YAHl9yQN+v0HTGG4QV3fXG&#xD;
+ztJLMGIEmyUR3CSu7KYHZ17XcgUsCFwrgbB24LgWC/CZg8r1eqb4lBh5V11b&#xD;
+MSyuoIPAZhmk7osFKHdJ3wlGfEIQf2bhl+op7u/VZQ==</license>
+  </server>
+</cruise>
+}
+
+      config = GoConfig.new(:xml => xml)
+      config.set_auto_registration_key("foobar")
+      assert config.xml_content =~ /<server.*agentAutoRegistrationKey="foobar".*/
+    end
+    
     def test_should_set_pipeline_in_a_config_file_with_no_pipelines_and_no_agents
       assert_pipeline_template %Q{<?xml version="1.0" encoding="utf-8"?>
           <cruise />
