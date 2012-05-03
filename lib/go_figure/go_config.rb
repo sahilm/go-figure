@@ -16,7 +16,7 @@ module GoFigure
     def set_auto_registration_key(key)
       @doc.root.xpath('server').first["agentAutoRegisterKey"] = key
     end
-    
+
     def set_pipeline(git_url, working_dir)
       @doc.root.xpath('pipelines').remove
       agents = @doc.root.xpath('agents')
@@ -30,11 +30,6 @@ module GoFigure
       @doc = Nokogiri.XML(@doc.to_s) do |config|
         config.default_xml.noblanks
       end
-
-      puts "************************************"
-      puts "Set new pipeline:"
-      puts xml_content
-      puts "************************************"
 
       @doc
     end
@@ -55,7 +50,7 @@ module GoFigure
     def set_test_unit
       @params[:test_unit] = true
     end
-    
+
     class PipelineConfig
       def initialize(git_url, working_dir, params)
         @git_url = git_url
