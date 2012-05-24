@@ -4,7 +4,7 @@ require "go_figure/version"
 
 Gem::Specification.new do |s|
   s.name        = "go_figure"
-  s.version     = GoFigure::VERSION
+  s.version     = GoFigure::Version::VERSION
   s.authors     = ["Nikhil Mungel", "Ketan Padegaonkar", "Shishir Das"]
   s.email       = ["hyfather@gmail.com", "KetanPadegaonkar@gmail.com", "shishir.das@gmail.com"]
   s.homepage    = "https://github.com/ThoughtWorksInc/go-figure"
