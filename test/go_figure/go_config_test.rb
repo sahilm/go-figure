@@ -21,7 +21,7 @@ MSyuoIPAZhmk7osFKHdJ3wlGfEIQf2bhl+op7u/VZQ==</license>
       config.set_auto_registration_key("foobar")
       assert config.xml_content =~ /<server.*agentAutoRegisterKey="foobar".*/
     end
-    
+
     def test_should_set_pipeline_in_a_config_file_with_no_pipelines_and_no_agents
       assert_pipeline_template %Q{<?xml version="1.0" encoding="utf-8"?>
           <cruise />
@@ -29,7 +29,6 @@ MSyuoIPAZhmk7osFKHdJ3wlGfEIQf2bhl+op7u/VZQ==</license>
     end
 
     def test_should_set_pipeline_in_a_config_file_with_pipelines_and_no_agents
-
       assert_pipeline_template %Q{<?xml version="1.0" encoding="utf-8"?>
           <cruise>
             <pipelines group="1">
@@ -62,6 +61,7 @@ MSyuoIPAZhmk7osFKHdJ3wlGfEIQf2bhl+op7u/VZQ==</license>
       }
     end
 
+    
     def test_should_set_the_rspec_pipeline_if_configured
       xml = %Q{<?xml version="1.0" encoding="utf-8"?>
           <cruise />
@@ -102,6 +102,79 @@ MSyuoIPAZhmk7osFKHdJ3wlGfEIQf2bhl+op7u/VZQ==</license>
       config = GoConfig.new(:xml => xml)
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
       assert config.xml_content !~ /<arg>rake<\/arg>.\s*<arg>test<\/arg>/m
+    end
+
+
+    test "should add an agent if there is no <pipelines> and no <agents/> tag" do
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+
+      config = GoConfig.new(:xml => xml)
+      agents =[
+        Agent.new('ho.st.name',  '12.0.0.121', 'some-uuid'),
+        Agent.new('ho.st.name2', '12.0.0.122', 'some-uuid2'),
+      ]
+
+      config.set_agents(agents)
+
+      doc = Nokogiri::XML(config.xml_content)
+
+      agent_nodes = doc.root.xpath("agents/*")
+      assert_equal 2, agent_nodes.size
+
+      assert_agent(agents.first, agent_nodes.first)
+      assert_agent(agents.last, agent_nodes.last)
+    end
+
+    test "should add an agent if there is a <pipeline> and no <agents/> tag" do
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise >
+            <pipelines group="1">
+            </pipelines>
+          </cruise>
+      }
+
+      config = GoConfig.new(:xml => xml)
+      agents =[
+        Agent.new('ho.st.name',  '12.0.0.121', 'some-uuid'),
+        Agent.new('ho.st.name2', '12.0.0.122', 'some-uuid2'),
+      ]
+
+      config.set_agents(agents)
+
+      doc = Nokogiri::XML(config.xml_content)
+
+      assert_equal ["pipelines", "agents"], doc.root.xpath("*").map(&:name)
+      assert_equal 1, doc.root.xpath('pipelines').count
+    end
+
+    test "should add an agent only if the agent is not present or disabled" do
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise >
+            <pipelines group="1">
+            </pipelines>
+          </cruise>
+      }
+
+      config = GoConfig.new(:xml => xml)
+      agents =[
+        Agent.new('ho.st.name',  '12.0.0.121', 'some-uuid'),
+        Agent.new('ho.st.name2', '12.0.0.122', 'some-uuid2'),
+      ]
+
+      config.set_agents(agents)
+      config.set_agents(agents)
+
+      doc = Nokogiri::XML(config.xml_content)
+      agent_nodes = doc.root.xpath("agents/*")
+      assert_equal 2, agent_nodes.count
+    end
+
+    def assert_agent(agent, agent_node)
+      assert_equal agent.hostname, agent_node.attr('hostname')
+      assert_equal agent.ipaddress, agent_node.attr('ipaddress')
+      assert_equal agent.uuid, agent_node.attr('uuid')
     end
 
     def test_should_link_the_db_yml_to_a_controlled_db_yml

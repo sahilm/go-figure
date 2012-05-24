@@ -34,6 +34,18 @@ module GoFigure
       @doc
     end
 
+    def set_agents(agents_to_enable)
+      existing_agents = @doc.root.xpath('agents/*')
+      agents = "<agents>"
+      agents_to_enable.inject(agents) do |str, agent|
+        if not existing_agents.any? { |a| a.attr("uuid") == agent.uuid }
+          str << %Q{<agent hostname="#{agent.hostname}" ipaddress="#{agent.ipaddress}" uuid="#{agent.uuid}"/>}
+        end
+      end
+      agents << "</agents>"
+      @doc.root << agents
+    end
+
     def pipeline_template(git_url, working_dir)
       template = ERB.new(File.read(File.expand_path('../../go-pipelines.xml.erb', __FILE__)))
       template.result(PipelineConfig.new(git_url, working_dir, @params).get_binding)
@@ -62,6 +74,9 @@ module GoFigure
         binding
       end
     end
-
   end
+
+  class Agent < Struct.new(:hostname, :ipaddress, :uuid)
+  end
+
 end
