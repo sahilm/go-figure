@@ -63,6 +63,10 @@ module GoFigure
       @params[:test_unit] = true
     end
 
+    def set_jasmine_headless_webkit
+      @params[:jasmine] = true
+    end
+
     class PipelineConfig
       def initialize(git_url, working_dir, params)
         @git_url = git_url

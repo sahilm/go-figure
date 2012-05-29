@@ -61,6 +61,18 @@ MSyuoIPAZhmk7osFKHdJ3wlGfEIQf2bhl+op7u/VZQ==</license>
       }
     end
 
+    def test_should_set_the_jasmine_headless_webkit_stage_if_configured
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+
+      config = GoConfig.new(:xml => xml)
+      config.set_jasmine_headless_webkit
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content =~ /<stage name..Functionals.>/m
+      assert config.xml_content =~ /<variable name=\"DISPLAY\"/m
+      assert config.xml_content =~ /<arg>rake<\/arg>.\s*<arg>jasmine\:headless<\/arg>/m
+    end
     
     def test_should_set_the_rspec_pipeline_if_configured
       xml = %Q{<?xml version="1.0" encoding="utf-8"?>
