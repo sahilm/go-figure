@@ -36,14 +36,14 @@ module GoFigure
 
     def set_agents(agents_to_enable)
       existing_agents = @doc.root.xpath('agents/*')
-      agents = "<agents>"
-      agents_to_enable.inject(agents) do |str, agent|
+      new_agents = agents_to_enable.collect do |agent|
         if not existing_agents.any? { |a| a.attr("uuid") == agent.uuid }
-          str << %Q{<agent hostname="#{agent.hostname}" ipaddress="#{agent.ipaddress}" uuid="#{agent.uuid}"/>}
+          %Q{<agent hostname="#{agent.hostname}" ipaddress="#{agent.ipaddress}" uuid="#{agent.uuid}"/>}
         end
       end
-      agents << "</agents>"
-      @doc.root << agents
+
+      agents = "<agents>#{new_agents.join}</agents>"
+      @doc.root << agents if new_agents.any?
     end
 
     def pipeline_template(git_url, working_dir)
