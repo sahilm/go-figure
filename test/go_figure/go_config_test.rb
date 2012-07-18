@@ -49,12 +49,14 @@ module GoFigure
 
       config = GoConfig.new(:xml => xml)
       config.set_jasmine_headless_webkit
+      config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ /<stage name..Functionals.>/m
-      assert config.xml_content =~ /<variable name=\"DISPLAY\"/m
-      assert config.xml_content =~ /<arg>rake<\/arg>.\s*<arg>jasmine\:headless<\/arg>/m
+
+      assert config.xml_content =~ %r{<stage name="BrowserTests">}
+      assert config.xml_content =~ %r{<variable name="DISPLAY">}
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake jasmine:headless</arg>}
     end
-    
+
     def test_should_set_the_rspec_pipeline_if_configured
       xml = %Q{<?xml version="1.0" encoding="utf-8"?>
           <cruise />
@@ -62,8 +64,9 @@ module GoFigure
 
       config = GoConfig.new(:xml => xml)
       config.set_rspec
+      config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ /<arg>rake<\/arg>.\s*<arg>spec<\/arg>/m
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake spec</arg>}
     end
 
     def test_should_not_set_the_rspec_pipeline_if_not_configured
@@ -73,7 +76,7 @@ module GoFigure
 
       config = GoConfig.new(:xml => xml)
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content !~ /<arg>rake<\/arg>.\s*<arg>spec<\/arg>/m
+      assert config.xml_content !~ %r{rake spec}
     end
 
     def test_should_set_the_test_unit_pipeline_if_configured
@@ -83,8 +86,9 @@ module GoFigure
 
       config = GoConfig.new(:xml => xml)
       config.set_test_unit
+      config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ /<arg>rake<\/arg>.\s*<arg>test<\/arg>/m
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake test</arg>}
     end
 
     def test_should_not_set_the_test_unit_pipeline_if_not_configured

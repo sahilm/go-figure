@@ -3,7 +3,7 @@
     <materials>
       <git autoUpdate="false" url="<%= @git_url %>" />
     </materials>
-    <stage name="Units">
+    <stage name="RailsTests">
       <jobs>
         <job name="Test">
           <tasks>
@@ -13,33 +13,27 @@
               <arg>config/database.yml</arg>
               <runif status="passed" />
             </exec>
-            <exec command="bundle">
-              <arg>install</arg>
-              <arg>--local</arg>
-              <arg>--path</arg>
-              <arg>.bundle</arg>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
-            <exec command="bundle">
-              <arg>exec</arg>
-              <arg>rake</arg>
-              <arg>db:create</arg>
-              <arg>db:migrate</arg>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
               <runif status="passed" />
             </exec>
             <% if @params[:test_unit] %>
-            <exec command="bundle">
-              <arg>exec</arg>
-              <arg>rake</arg>
-              <arg>test</arg>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake test</arg>
               <runif status="passed" />
             </exec>
             <%end%>
             <% if @params[:rspec] %>
-            <exec command="bundle">
-              <arg>exec</arg>
-              <arg>rake</arg>
-              <arg>spec</arg>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake spec</arg>
               <runif status="passed" />
             </exec>
             <%end%>
@@ -47,9 +41,8 @@
         </job>
       </jobs>
     </stage>
-
   <% if @params[:jasmine] %>
-    <stage name="Functionals">
+    <stage name="BrowserTests">
       <jobs>
         <job name="Jasmine">
           <environmentvariables>
@@ -64,24 +57,19 @@
               <arg>config/database.yml</arg>
               <runif status="passed" />
             </exec>
-            <exec command="bundle">
-              <arg>install</arg>
-              <arg>--local</arg>
-              <arg>--path</arg>
-              <arg>.bundle</arg>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
-            <exec command="bundle">
-              <arg>exec</arg>
-              <arg>rake</arg>
-              <arg>db:create</arg>
-              <arg>db:migrate</arg>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
               <runif status="passed" />
             </exec>
-            <exec command="bundle">
-              <arg>exec</arg>
-              <arg>rake</arg>
-              <arg>jasmine:headless</arg>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake jasmine:headless</arg>
               <runif status="passed" />
             </exec>
           </tasks>

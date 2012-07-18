@@ -55,6 +55,14 @@ module GoFigure
       @doc.to_s
     end
 
+    def set_ruby(ruby)
+      @params[:ruby] = ruby
+    end
+
+    def set_init(init)
+      @params[:init] = init
+    end
+
     def set_rspec
       @params[:rspec] = true
     end
