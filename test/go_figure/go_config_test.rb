@@ -54,7 +54,7 @@ module GoFigure
 
       assert config.xml_content =~ %r{<stage name="BrowserTests">}
       assert config.xml_content =~ %r{<variable name="DISPLAY">}
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake jasmine:headless</arg>}
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace jasmine:headless</arg>}
     end
 
     def test_should_set_the_rspec_pipeline_if_configured
@@ -66,7 +66,7 @@ module GoFigure
       config.set_rspec
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake spec</arg>}
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace spec</arg>}
     end
 
     def test_should_not_set_the_rspec_pipeline_if_not_configured
@@ -88,7 +88,7 @@ module GoFigure
       config.set_test_unit
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake test</arg>}
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace test</arg>}
     end
 
     def test_should_not_set_the_test_unit_pipeline_if_not_configured
@@ -194,14 +194,14 @@ module GoFigure
       config.set_ruby('/usr/bin/ruby')
       config.set_twist
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake twist:run_tests</arg>}
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake twist:server:stop</arg>}
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
 
       config = GoConfig.new(:xml => xml)
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake twist:run_tests</arg>}
-      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake twist:server:stop</arg>}
+      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
+      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
     end
 
     def assert_pipeline_template(xml)
