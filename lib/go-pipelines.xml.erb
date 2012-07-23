@@ -20,7 +20,7 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake db:drop db:create db:migrate db:test:prepare</arg>
               <runif status="passed" />
             </exec>
             <% if @params[:test_unit] %>
