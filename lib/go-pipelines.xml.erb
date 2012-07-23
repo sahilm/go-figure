@@ -20,20 +20,20 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake db:drop db:create db:migrate db:test:prepare</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate db:test:prepare</arg>
               <runif status="passed" />
             </exec>
             <% if @params[:test_unit] %>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake test</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace test</arg>
               <runif status="passed" />
             </exec>
             <%end%>
             <% if @params[:rspec] %>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake spec</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace spec</arg>
               <runif status="passed" />
             </exec>
             <%end%>
@@ -64,12 +64,12 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:create db:migrate</arg>
               <runif status="passed" />
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake jasmine:headless</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace jasmine:headless</arg>
               <runif status="passed" />
             </exec>
           </tasks>
@@ -95,17 +95,17 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:create db:migrate</arg>
               <runif status="passed" />
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake twist:run_tests</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:run_tests</arg>
               <runif status="passed" />
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake twist:server:stop</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:server:stop</arg>
               <runif status="any" />
             </exec>
           </tasks>
