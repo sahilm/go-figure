@@ -185,6 +185,25 @@ module GoFigure
       assert config.xml_content =~ /<exec command="\/bin\/ln">.\s*<arg>-sf<\/arg>.\s*<arg>\/etc\/go_saas\/database.yml<\/arg>.\s*<arg>config\/database.yml<\/arg>/m
     end
 
+    def test_should_support_twist
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+
+      config = GoConfig.new(:xml => xml)
+      config.set_ruby('/usr/bin/ruby')
+      config.set_twist
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake twist:run_tests</arg>}
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake twist:server:stop</arg>}
+
+      config = GoConfig.new(:xml => xml)
+      config.set_ruby('/usr/bin/ruby')
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake twist:run_tests</arg>}
+      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake twist:server:stop</arg>}
+    end
+
     def assert_pipeline_template(xml)
       config = GoConfig.new(:xml => xml)
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')

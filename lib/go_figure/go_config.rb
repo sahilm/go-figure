@@ -71,6 +71,10 @@ module GoFigure
       @params[:test_unit] = true
     end
 
+    def set_twist
+      @params[:twist] = true
+    end
+
     def set_jasmine_headless_webkit
       @params[:jasmine] = true
     end

@@ -77,5 +77,41 @@
       </jobs>
     </stage>
   <% end %>
+  <% if @params[:twist] %>
+    <stage name="TwistTests">
+      <jobs>
+        <job name="StartServer">
+          <tasks>
+            <exec command="/bin/ln">
+              <arg>-sf</arg>
+              <arg>/etc/go_saas/database.yml</arg>
+              <arg>config/database.yml</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:init] %></arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake twist:run_tests</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake twist:server:stop</arg>
+              <runif status="any" />
+            </exec>
+          </tasks>
+        </job>
+      </jobs>
+    </stage>
+  <% end %>
   </pipeline>
 </pipelines>
