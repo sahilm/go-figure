@@ -194,12 +194,14 @@ module GoFigure
       config.set_ruby('/usr/bin/ruby')
       config.set_twist
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
       assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
       assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
 
       config = GoConfig.new(:xml => xml)
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
       assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
       assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
     end
