@@ -52,9 +52,20 @@ module GoFigure
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
 
-      assert config.xml_content =~ %r{<stage name="BrowserTests">}
-      assert config.xml_content =~ %r{<variable name="DISPLAY">}
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace jasmine:headless</arg>}
+      assert config.xml_content.include? %Q{<stage name="BrowserTests">}
+      assert config.xml_content.include? %Q{<variable name="DISPLAY">}
+      assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace jasmine:headless</arg>}
+      assert config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
+      assert config.xml_content.include? %Q{<arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | cut -d' ' -f2 | xargs kill  || true</arg>}
+
+      config = GoConfig.new(:xml => xml)
+      config.set_ruby('/usr/bin/ruby')
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert_false config.xml_content.include? %Q{<stage name="BrowserTests">}
+      assert_false config.xml_content.include? %Q{<variable name="DISPLAY">}
+      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace jasmine:headless</arg>}
+      assert_false config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
+      assert_false config.xml_content.include? %Q{<arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | cut -d' ' -f2 | xargs kill  || true</arg>}
     end
 
     def test_should_set_the_rspec_pipeline_if_configured
@@ -194,16 +205,22 @@ module GoFigure
       config.set_ruby('/usr/bin/ruby')
       config.set_twist
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
+      assert config.xml_content.include? %Q{<variable name="DISPLAY">}
+      assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
+      assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
+      assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
+      assert config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
+      assert config.xml_content.include? %Q{<arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | cut -d' ' -f2 | xargs kill  || true</arg>}
 
       config = GoConfig.new(:xml => xml)
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
-      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
-      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
+      assert_false config.xml_content.include? %Q{<variable name="DISPLAY">}
+      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
+      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
+      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
+      assert_false config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
+      assert_false config.xml_content.include? %Q{<arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | cut -d' ' -f2 | xargs kill  || true</arg>}
     end
 
     def assert_pipeline_template(xml)

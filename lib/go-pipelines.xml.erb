@@ -47,7 +47,7 @@
         <job name="Jasmine">
           <environmentvariables>
             <variable name="DISPLAY">
-              <value>:1</value>
+              <value>:100</value>
             </variable>
           </environmentvariables>
           <tasks>
@@ -69,8 +69,18 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
+              <arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake --trace jasmine:headless</arg>
               <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | cut -d' ' -f2 | xargs kill  || true</arg>
+              <runif status="any" />
             </exec>
           </tasks>
         </job>
@@ -81,6 +91,11 @@
     <stage name="TwistTests">
       <jobs>
         <job name="StartServer">
+          <environmentvariables>
+            <variable name="DISPLAY">
+              <value>:100</value>
+            </variable>
+          </environmentvariables>
           <tasks>
             <exec command="/bin/ln">
               <arg>-sf</arg>
@@ -100,12 +115,22 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
+              <arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:run_tests</arg>
               <runif status="passed" />
             </exec>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:server:stop</arg>
+              <runif status="any" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | cut -d' ' -f2 | xargs kill  || true</arg>
               <runif status="any" />
             </exec>
           </tasks>
