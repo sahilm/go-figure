@@ -120,6 +120,11 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
+              <arg>cp test/twist/src/twist.linux.properties test/twist/src/twist.properties</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:run_tests</arg>
               <runif status="passed" />
             </exec>
