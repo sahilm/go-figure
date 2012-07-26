@@ -79,7 +79,7 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | cut -d' ' -f2 | xargs kill  || true</arg>
+              <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>
               <runif status="any" />
             </exec>
           </tasks>
@@ -135,7 +135,7 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | cut -d' ' -f2 | xargs kill  || true</arg>
+              <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>
               <runif status="any" />
             </exec>
           </tasks>
