@@ -52,9 +52,20 @@ module GoFigure
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
 
-      assert config.xml_content =~ %r{<stage name="BrowserTests">}
-      assert config.xml_content =~ %r{<variable name="DISPLAY">}
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake jasmine:headless</arg>}
+      assert config.xml_content.include? %Q{<stage name="BrowserTests">}
+      assert config.xml_content.include? %Q{<variable name="DISPLAY">}
+      assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace jasmine:headless</arg>}
+      assert config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
+      assert config.xml_content.include? %Q{<arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>}
+
+      config = GoConfig.new(:xml => xml)
+      config.set_ruby('/usr/bin/ruby')
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert_false config.xml_content.include? %Q{<stage name="BrowserTests">}
+      assert_false config.xml_content.include? %Q{<variable name="DISPLAY">}
+      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace jasmine:headless</arg>}
+      assert_false config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
+      assert_false config.xml_content.include? %Q{<arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>}
     end
 
     def test_should_set_the_rspec_pipeline_if_configured
@@ -66,7 +77,7 @@ module GoFigure
       config.set_rspec
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake spec</arg>}
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace spec</arg>}
     end
 
     def test_should_not_set_the_rspec_pipeline_if_not_configured
@@ -88,7 +99,7 @@ module GoFigure
       config.set_test_unit
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake test</arg>}
+      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace test</arg>}
     end
 
     def test_should_not_set_the_test_unit_pipeline_if_not_configured
@@ -197,6 +208,35 @@ module GoFigure
       config = GoConfig.new(:xml => xml)
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
       assert config.xml_content =~ /<exec command="\/bin\/ln">.\s*<arg>-sf<\/arg>.\s*<arg>\/etc\/go_saas\/database.yml<\/arg>.\s*<arg>config\/database.yml<\/arg>/m
+    end
+
+    def test_should_support_twist
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+
+      config = GoConfig.new(:xml => xml)
+      config.set_ruby('/usr/bin/ruby')
+      config.set_twist
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content.include? %Q{<variable name="DISPLAY">}
+      assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
+      assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
+      assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
+      assert config.xml_content.include? %Q{cp test/twist/src/twist.linux.properties test/twist/src/twist.properties}
+      assert config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
+      assert config.xml_content.include? %Q{<arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>}
+
+      config = GoConfig.new(:xml => xml)
+      config.set_ruby('/usr/bin/ruby')
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert_false config.xml_content.include? %Q{<variable name="DISPLAY">}
+      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
+      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
+      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
+      assert_false config.xml_content.include? %Q{cp test/twist/src/twist.linux.properties test/twist/src/twist.properties}
+      assert_false config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
+      assert_false config.xml_content.include? %Q{ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>}
     end
 
     def assert_pipeline_template(xml)

@@ -20,20 +20,20 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate db:test:prepare</arg>
               <runif status="passed" />
             </exec>
             <% if @params[:test_unit] %>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake test</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace test</arg>
               <runif status="passed" />
             </exec>
             <%end%>
             <% if @params[:rspec] %>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake spec</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace spec</arg>
               <runif status="passed" />
             </exec>
             <%end%>
@@ -47,7 +47,7 @@
         <job name="Jasmine">
           <environmentvariables>
             <variable name="DISPLAY">
-              <value>:1</value>
+              <value>:100</value>
             </variable>
           </environmentvariables>
           <tasks>
@@ -64,13 +64,79 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:create db:migrate</arg>
               <runif status="passed" />
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake jasmine:headless</arg>
+              <arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>
               <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace jasmine:headless</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>
+              <runif status="any" />
+            </exec>
+          </tasks>
+        </job>
+      </jobs>
+    </stage>
+  <% end %>
+  <% if @params[:twist] %>
+    <stage name="TwistTests">
+      <jobs>
+        <job name="StartServer">
+          <environmentvariables>
+            <variable name="DISPLAY">
+              <value>:100</value>
+            </variable>
+          </environmentvariables>
+          <tasks>
+            <exec command="/bin/ln">
+              <arg>-sf</arg>
+              <arg>/etc/go_saas/database.yml</arg>
+              <arg>config/database.yml</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:init] %></arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg>cp test/twist/src/twist.linux.properties test/twist/src/twist.properties</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:run_tests</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:server:stop</arg>
+              <runif status="any" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>
+              <runif status="any" />
             </exec>
           </tasks>
         </job>
