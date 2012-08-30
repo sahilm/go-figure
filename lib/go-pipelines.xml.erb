@@ -77,5 +77,36 @@
       </jobs>
     </stage>
   <% end %>
+  <% if @params[:post_build_hook] %>
+    <stage name="PostBuildHook">
+      <jobs>
+        <job name="PostBuildHook">
+          <tasks>
+            <exec command="/bin/ln">
+              <arg>-sf</arg>
+              <arg>/etc/go_saas/database.yml</arg>
+              <arg>config/database.yml</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:init] %></arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec <%= @params[:post_build_hook] %></arg>
+              <runif status="passed" />
+            </exec>
+          </tasks>
+        </job>
+      </jobs>
+    </stage>
+  <% end %>
   </pipeline>
 </pipelines>

@@ -169,6 +169,20 @@ module GoFigure
       assert_equal 2, agent_nodes.count
     end
 
+    test "should add post build hook if a build hook is set" do
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+
+      config = GoConfig.new(:xml => xml)
+      config.set_ruby('/usr/bin/ruby')
+      config.set_post_build_hook('rm -rf /')
+
+      assert config.xml_content !~ /PostBuildHook/m
+      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake db:create db:migrate</arg>}
+      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rm -rf /</arg>}
+    end
+
     def assert_agent(agent, agent_node)
       assert_equal agent.hostname, agent_node.attr('hostname')
       assert_equal agent.ipaddress, agent_node.attr('ipaddress')

@@ -55,6 +55,10 @@ module GoFigure
       @doc.to_s
     end
 
+    def set_post_build_hook(post_build_hook)
+      @params[:post_build_hook] = post_build_hook
+    end
+
     def set_ruby(ruby)
       @params[:ruby] = ruby
     end
