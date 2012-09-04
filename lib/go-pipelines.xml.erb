@@ -7,22 +7,26 @@
       <jobs>
         <job name="Test">
           <tasks>
+          <% if @params["database_required"] %>
             <exec command="/bin/ln">
               <arg>-sf</arg>
               <arg>/etc/go_saas/database.yml</arg>
               <arg>config/database.yml</arg>
               <runif status="passed" />
             </exec>
+           <% end %>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
+          <% if @params["database_required"] %>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate db:test:prepare</arg>
               <runif status="passed" />
             </exec>
+          <% end %>
             <% if @params[:test_unit] %>
             <exec command="bash">
               <arg>-c</arg>
@@ -51,22 +55,26 @@
             </variable>
           </environmentvariables>
           <tasks>
+          <% if @params["database_required"] %>
             <exec command="/bin/ln">
               <arg>-sf</arg>
               <arg>/etc/go_saas/database.yml</arg>
               <arg>config/database.yml</arg>
               <runif status="passed" />
             </exec>
+            <%end%>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
+          <% if @params["database_required"] %>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:create db:migrate</arg>
               <runif status="passed" />
             </exec>
+          <%end%>
             <exec command="bash">
               <arg>-c</arg>
               <arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>
@@ -97,22 +105,26 @@
             </variable>
           </environmentvariables>
           <tasks>
+          <% if @params["database_required"] %>
             <exec command="/bin/ln">
               <arg>-sf</arg>
               <arg>/etc/go_saas/database.yml</arg>
               <arg>config/database.yml</arg>
               <runif status="passed" />
             </exec>
+            <%end%>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
+          <%if @params["database_required"] %>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate</arg>
               <runif status="passed" />
             </exec>
+          <%end%>
             <exec command="bash">
               <arg>-c</arg>
               <arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>
@@ -148,22 +160,26 @@
       <jobs>
         <job name="PostBuildHook">
           <tasks>
+          <% if @params["database_required"] %>
             <exec command="/bin/ln">
               <arg>-sf</arg>
               <arg>/etc/go_saas/database.yml</arg>
               <arg>config/database.yml</arg>
               <runif status="passed" />
             </exec>
+            <%end%>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
+          <% if @params["database_required"] %>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
               <runif status="passed" />
             </exec>
+           <% end%>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec <%= @params[:post_build_hook] %></arg>
