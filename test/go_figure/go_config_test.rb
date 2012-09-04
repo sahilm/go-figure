@@ -206,7 +206,9 @@ module GoFigure
       }
 
       config = GoConfig.new(:xml => xml)
+      config.set_database_required
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+
       assert config.xml_content =~ /<exec command="\/bin\/ln">.\s*<arg>-sf<\/arg>.\s*<arg>\/etc\/go_saas\/database.yml<\/arg>.\s*<arg>config\/database.yml<\/arg>/m
     end
 
@@ -218,7 +220,9 @@ module GoFigure
       config = GoConfig.new(:xml => xml)
       config.set_ruby('/usr/bin/ruby')
       config.set_twist
+      config.set_database_required
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+
       assert config.xml_content.include? %Q{<variable name="DISPLAY">}
       assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
       assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}

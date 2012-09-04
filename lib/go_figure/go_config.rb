@@ -74,7 +74,7 @@ module GoFigure
     def set_test_unit
       @params[:test_unit] = true
     end
-
+    
     def set_twist
       @params[:twist] = true
     end

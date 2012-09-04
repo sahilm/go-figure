@@ -7,7 +7,7 @@
       <jobs>
         <job name="Test">
           <tasks>
-          <% if @params["database_required"] %>
+          <% if @params[:database_required] %>
             <exec command="/bin/ln">
               <arg>-sf</arg>
               <arg>/etc/go_saas/database.yml</arg>
@@ -20,7 +20,7 @@
               <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
-          <% if @params["database_required"] %>
+          <% if @params[:database_required] %>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate db:test:prepare</arg>
@@ -55,7 +55,7 @@
             </variable>
           </environmentvariables>
           <tasks>
-          <% if @params["database_required"] %>
+          <% if @params[:database_required] %>
             <exec command="/bin/ln">
               <arg>-sf</arg>
               <arg>/etc/go_saas/database.yml</arg>
@@ -68,7 +68,7 @@
               <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
-          <% if @params["database_required"] %>
+          <% if @params[:database_required] %>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:create db:migrate</arg>
@@ -105,7 +105,7 @@
             </variable>
           </environmentvariables>
           <tasks>
-          <% if @params["database_required"] %>
+          <% if @params[:database_required] %>
             <exec command="/bin/ln">
               <arg>-sf</arg>
               <arg>/etc/go_saas/database.yml</arg>
@@ -118,7 +118,7 @@
               <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
-          <%if @params["database_required"] %>
+          <%if @params[:database_required] %>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate</arg>
@@ -160,7 +160,7 @@
       <jobs>
         <job name="PostBuildHook">
           <tasks>
-          <% if @params["database_required"] %>
+          <% if @params[:database_required] %>
             <exec command="/bin/ln">
               <arg>-sf</arg>
               <arg>/etc/go_saas/database.yml</arg>
@@ -173,7 +173,7 @@
               <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
-          <% if @params["database_required"] %>
+          <% if @params[:database_required] %>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
