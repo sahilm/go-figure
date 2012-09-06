@@ -55,6 +55,10 @@ module GoFigure
       @doc.to_s
     end
 
+    def set_post_build_hook(post_build_hook)
+      @params[:post_build_hook] = post_build_hook
+    end
+
     def set_ruby(ruby)
       @params[:ruby] = ruby
     end
@@ -69,6 +73,14 @@ module GoFigure
 
     def set_test_unit
       @params[:test_unit] = true
+    end
+    
+    def set_twist
+      @params[:twist] = true
+    end
+
+    def set_database_required
+      @params[:database_required] = true
     end
 
     def set_jasmine_headless_webkit
