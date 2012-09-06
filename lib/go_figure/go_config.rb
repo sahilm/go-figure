@@ -75,6 +75,10 @@ module GoFigure
       @params[:jasmine] = true
     end
 
+    def set_custom_params(value)
+      @params[:custom] = value
+    end
+
     class PipelineConfig
       def initialize(git_url, working_dir, params)
         @git_url = git_url

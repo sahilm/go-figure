@@ -1,5 +1,14 @@
 <pipelines group="defaultGroup">
   <pipeline name="defaultPipeline">
+    <%if @params[:custom]%>
+     <environmentvariables>
+       <%@params[:custom].each do |key, value|%>
+        <variable name="<%=key%>">
+          <value><%=value%></value>
+        </variable>
+       <%end%>
+      </environmentvariables>
+    <%end%>
     <materials>
       <git autoUpdate="false" url="<%= @git_url %>" />
     </materials>
