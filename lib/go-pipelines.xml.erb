@@ -1,8 +1,8 @@
 <pipelines group="defaultGroup">
   <pipeline name="defaultPipeline">
-    <%if @params[:custom]%>
+    <%if @params[:environment_variables]%>
      <environmentvariables>
-       <%@params[:custom].each do |key, value|%>
+       <%@params[:environment_variables].each do |key, value|%>
         <variable name="<%=key%>">
           <value><%=value%></value>
         </variable>

@@ -250,15 +250,15 @@ module GoFigure
       assert config.xml_content =~ %r{<git autoUpdate="false" url="http://git.example.com/my_project/atlas.git"/>}
     end
 
-    def test_should_set_the_custom_params_as_environment_variables
+    def test_should_set_the_environment_variables
       xml = %Q{<?xml version="1.0" encoding="utf-8"?>
           <cruise />
       }
 
       config = GoConfig.new(:xml => xml)
-      config.set_custom_params({:key1 => :value1, :key2 => :value2})
+      config.set_environment_variables({:key1 => :value1, :key2 => :value2})
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-     
+
       assert config.xml_content =~ /<environmentvariables>\s*<variable name="key1">\s*<value>value1<\/value>\s*<\/variable>.*<\/environmentvariables>/m
     end
 

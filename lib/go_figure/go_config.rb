@@ -74,7 +74,7 @@ module GoFigure
     def set_test_unit
       @params[:test_unit] = true
     end
-    
+
     def set_twist
       @params[:twist] = true
     end
@@ -87,8 +87,8 @@ module GoFigure
       @params[:jasmine] = true
     end
 
-    def set_custom_params(value)
-      @params[:custom] = value
+    def set_environment_variables(value)
+      @params[:environment_variables] = value
     end
 
     class PipelineConfig
