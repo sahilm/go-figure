@@ -52,7 +52,7 @@ module GoFigure
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
 
-      assert config.xml_content.include? %Q{<stage name="BrowserTests">}
+      assert config.xml_content.include? %Q{<stage name="Functionals">}
       assert config.xml_content.include? %Q{<variable name="DISPLAY">}
       assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace jasmine:headless</arg>}
       assert config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|

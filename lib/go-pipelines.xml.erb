@@ -12,7 +12,7 @@
     <materials>
       <git autoUpdate="false" url="<%= @git_url %>" />
     </materials>
-    <stage name="RailsTests">
+    <stage name="Units">
       <jobs>
         <job name="Test">
           <tasks>
@@ -55,7 +55,7 @@
       </jobs>
     </stage>
   <% if @params[:jasmine] %>
-    <stage name="BrowserTests">
+    <stage name="Functionals">
       <jobs>
         <job name="Jasmine">
           <environmentvariables>
@@ -165,9 +165,9 @@
     </stage>
   <% end %>
   <% if @params[:post_build_hook] %>
-    <stage name="PostBuildHook">
+    <stage name="PostBuild">
       <jobs>
-        <job name="PostBuildHook">
+        <job name="PostBuild">
           <tasks>
           <% if @params[:database_required] %>
             <exec command="/bin/ln">
