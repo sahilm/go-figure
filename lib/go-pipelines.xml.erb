@@ -185,7 +185,7 @@
           <% if @params[:database_required] %>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake db:create db:migrate</arg>
+              <arg><%= @params[:ruby] %> -S bundle exec rake db:drop db:create db:migrate</arg>
               <runif status="passed" />
             </exec>
            <% end%>
