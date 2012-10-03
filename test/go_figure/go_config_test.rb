@@ -56,7 +56,7 @@ module GoFigure
       assert config.xml_content.include? %Q{<variable name="DISPLAY">}
       assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace jasmine:headless</arg>}
       assert config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
-      assert config.xml_content.include? %Q{<arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>}
+        assert config.xml_content.include? %Q{<arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>}
 
       config = GoConfig.new(:xml => xml)
       config.set_ruby('/usr/bin/ruby')
@@ -78,6 +78,17 @@ module GoFigure
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
       assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace spec</arg>}
+    end
+
+    test "should create the heroku deploy stage if configured" do
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+      config = GoConfig.new(:xml => xml)
+      config.set_heroku_deploy
+      config.set_ruby('/usr/bin/ruby')
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content =~ %r{<arg>git push heroku master</arg>}
     end
 
     def test_should_not_set_the_rspec_pipeline_if_not_configured
@@ -120,9 +131,9 @@ module GoFigure
 
       config = GoConfig.new(:xml => xml)
       agents =[
-        Agent.new('ho.st.name',  '12.0.0.121', 'some-uuid'),
-        Agent.new('ho.st.name2', '12.0.0.122', 'some-uuid2'),
-      ]
+               Agent.new('ho.st.name',  '12.0.0.121', 'some-uuid'),
+               Agent.new('ho.st.name2', '12.0.0.122', 'some-uuid2'),
+              ]
 
       config.set_agents(agents)
 
@@ -145,9 +156,9 @@ module GoFigure
 
       config = GoConfig.new(:xml => xml)
       agents =[
-        Agent.new('ho.st.name',  '12.0.0.121', 'some-uuid'),
-        Agent.new('ho.st.name2', '12.0.0.122', 'some-uuid2'),
-      ]
+               Agent.new('ho.st.name',  '12.0.0.121', 'some-uuid'),
+               Agent.new('ho.st.name2', '12.0.0.122', 'some-uuid2'),
+              ]
 
       config.set_agents(agents)
 
@@ -167,9 +178,9 @@ module GoFigure
 
       config = GoConfig.new(:xml => xml)
       agents =[
-        Agent.new('ho.st.name',  '12.0.0.121', 'some-uuid'),
-        Agent.new('ho.st.name2', '12.0.0.122', 'some-uuid2'),
-      ]
+               Agent.new('ho.st.name',  '12.0.0.121', 'some-uuid'),
+               Agent.new('ho.st.name2', '12.0.0.122', 'some-uuid2'),
+              ]
 
       config.set_agents(agents)
       config.set_agents(agents)
@@ -231,15 +242,15 @@ module GoFigure
       assert config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
       assert config.xml_content.include? %Q{<arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>}
 
-      config = GoConfig.new(:xml => xml)
-      config.set_ruby('/usr/bin/ruby')
-      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert_false config.xml_content.include? %Q{<variable name="DISPLAY">}
-      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
+  config = GoConfig.new(:xml => xml)
+  config.set_ruby('/usr/bin/ruby')
+  config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+  assert_false config.xml_content.include? %Q{<variable name="DISPLAY">}
+  assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace db:drop db:create db:migrate</arg>}
       assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:run_tests</arg>}
       assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace twist:server:stop</arg>}
       assert_false config.xml_content.include? %Q{cp test/twist/src/twist.linux.properties test/twist/src/twist.properties}
-      assert_false config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
+  assert_false config.xml_content.include? %Q|<arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>|
       assert_false config.xml_content.include? %Q{ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>}
     end
 

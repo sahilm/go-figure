@@ -91,6 +91,10 @@ module GoFigure
       @params[:environment_variables] = value
     end
 
+    def set_heroku_deploy
+      @params[:heroku_deploy] = true
+    end
+
     class PipelineConfig
       def initialize(git_url, working_dir, params)
         @git_url = git_url

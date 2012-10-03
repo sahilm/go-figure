@@ -199,5 +199,33 @@
       </jobs>
     </stage>
   <% end %>
+    <% if @params[:heroku_deploy] %>
+    <stage name="HerokuDeployment">
+      <jobs>
+        <job name="HerokuDeployment">
+          <tasks>
+          <% if @params[:database_required] %>
+            <exec command="/bin/ln">
+              <arg>-sf</arg>
+              <arg>/etc/go_saas/database.yml</arg>
+              <arg>config/database.yml</arg>
+              <runif status="passed" />
+            </exec>
+            <%end%>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg><%= @params[:init] %></arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
+              <arg>git push heroku master</arg>
+              <runif status="passed" />
+            </exec>
+          </tasks>
+        </job>
+      </jobs>
+    </stage>
+  <% end %>
   </pipeline>
 </pipelines>
