@@ -219,6 +219,11 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
+              <arg><%= @params[:ruby] %> -S heroku create</arg>
+              <runif status="passed" />
+            </exec>
+            <exec command="bash">
+              <arg>-c</arg>
               <arg>git push heroku master</arg>
               <runif status="passed" />
             </exec>
