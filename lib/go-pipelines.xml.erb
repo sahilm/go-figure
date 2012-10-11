@@ -219,7 +219,7 @@
             </exec>
             <exec command="bash">
               <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S heroku create</arg>
+              <arg>~/herokuSetup.sh <%= @params[:ruby] %></arg>
               <runif status="passed" />
             </exec>
             <exec command="bash">
