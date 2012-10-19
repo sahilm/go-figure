@@ -88,7 +88,7 @@ module GoFigure
       config.set_heroku_deploy
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S heroku create</arg>}
+      assert config.xml_content =~ %r{<arg>~/herokuSetup.sh /usr/bin/ruby</arg>}
       assert config.xml_content =~ %r{<arg>git push heroku master</arg>}
     end
 
