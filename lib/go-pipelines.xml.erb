@@ -1,17 +1,17 @@
 <pipelines group="defaultGroup">
   <pipeline name="defaultPipeline">
-    <%if @params[:environment_variables]%>
      <environmentvariables>
+    <%if @params[:environment_variables]%>
        <%@params[:environment_variables].each do |key, value|%>
         <variable name="<%=key%>">
           <value><%=value%></value>
         </variable>
        <%end%>
-			 <variable name="PATH">
-				<value><%= @params[:ruby] %>:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/bin</value>
-			 </variable>
-      </environmentvariables>
     <%end%>
+			<variable name="PATH">
+				<value><%= @params[:ruby] %>:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/bin</value>
+			</variable>
+      </environmentvariables>
     <materials>
       <git autoUpdate="false" url="<%= @git_url %>" />
     </materials>
