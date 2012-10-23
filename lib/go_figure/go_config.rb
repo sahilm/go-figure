@@ -61,6 +61,7 @@ module GoFigure
 
     def set_ruby(ruby)
       @params[:ruby] = ruby
+      @params[:ruby_path] = ruby.gsub(/bin\/ruby$/, "bin") if ruby
     end
 
     def set_init(init)
