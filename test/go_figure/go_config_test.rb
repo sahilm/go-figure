@@ -224,6 +224,32 @@ module GoFigure
       assert config.xml_content =~ /<exec command="\/bin\/ln">.\s*<arg>-sf<\/arg>.\s*<arg>\/etc\/go_saas\/database.yml<\/arg>.\s*<arg>config\/database.yml<\/arg>/m
     end
 
+    def test_should_cleanup_existing_agents
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+      <cruise>
+        <agents>
+          <agent hostname="template" ipaddress="192.168.1.1" uuid="b0bfaba8-f315-450b-9450-5f71f92e5bc0"/>
+        </agents>
+        </cruise>
+      }
+  
+      config = GoConfig.new(:xml => xml)
+      agents =[
+        Agent.new('ho.st.name',  '12.0.0.121', 'some-uuid'),
+        Agent.new('ho.st.name2', '12.0.0.122', 'some-uuid2'),
+      ]
+
+      config.set_agents(agents)
+  
+      doc = Nokogiri::XML(config.xml_content)
+
+      agents_nodes = doc.root.xpath("agents")
+      assert_equal 1, agents_nodes.size
+
+      agent_nodes = doc.root.xpath("agents/agent")
+      assert_equal 2, agent_nodes.size
+    end
+
     def test_should_support_twist
       xml = %Q{<?xml version="1.0" encoding="utf-8"?>
           <cruise />
