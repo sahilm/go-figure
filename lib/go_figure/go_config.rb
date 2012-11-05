@@ -94,8 +94,8 @@ module GoFigure
       @params[:environment_variables] = value
     end
 
-    def set_heroku_deploy
-      @params[:heroku_deploy] = true
+    def set_heroku_deploy(heroku_deploy)
+      @params[:heroku_deploy] = heroku_deploy
     end
 
     class PipelineConfig

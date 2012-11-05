@@ -1,17 +1,17 @@
 <pipelines group="defaultGroup">
   <pipeline name="defaultPipeline">
-     <environmentvariables>
-    <%if @params[:environment_variables]%>
-       <%@params[:environment_variables].each do |key, value|%>
-        <variable name="<%=key%>">
-          <value><%=value%></value>
+    <% if @params[:environment_variables] %>
+      <environmentvariables>
+        <% @params[:environment_variables].each do |key, value| %>
+          <variable name="<%=key%>">
+            <value><%=value%></value>
+          </variable>
+        <% end %>
+        <variable name="PATH">
+          <value><%= @params[:ruby_path] %>:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin</value>
         </variable>
-       <%end%>
-    <%end%>
-			<variable name="PATH">
-				<value><%= @params[:ruby_path] %>:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin</value>
-			</variable>
       </environmentvariables>
+    <% end %>
     <materials>
       <git autoUpdate="false" url="<%= @git_url %>" />
     </materials>
@@ -19,221 +19,226 @@
       <jobs>
         <job name="Test">
           <tasks>
-          <% if @params[:database_required] %>
-            <exec command="/bin/ln">
-              <arg>-sf</arg>
-              <arg>/etc/go_saas/database.yml</arg>
-              <arg>config/database.yml</arg>
-              <runif status="passed" />
-            </exec>
-           <% end %>
+            <% if @params[:database_required] %>
+              <exec command="/bin/ln">
+                <arg>-sf</arg>
+                <arg>/etc/go_saas/database.yml</arg>
+                <arg>config/database.yml</arg>
+                <runif status="passed" />
+              </exec>
+            <% end %>
             <exec command="bash">
               <arg>-c</arg>
               <arg><%= @params[:init] %></arg>
               <runif status="passed" />
             </exec>
-          <% if @params[:database_required] %>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate db:test:prepare</arg>
-              <runif status="passed" />
-            </exec>
-          <% end %>
+            <% if @params[:database_required] %>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate db:test:prepare</arg>
+                <runif status="passed" />
+              </exec>
+            <% end %>
             <% if @params[:test_unit] %>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake --trace test</arg>
-              <runif status="passed" />
-            </exec>
-            <%end%>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:ruby] %> -S bundle exec rake --trace test</arg>
+                <runif status="passed" />
+              </exec>
+            <% end %>
             <% if @params[:rspec] %>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake --trace spec</arg>
-              <runif status="passed" />
-            </exec>
-            <%end%>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:ruby] %> -S bundle exec rake --trace spec</arg>
+                <runif status="passed" />
+              </exec>
+            <% end %>
           </tasks>
         </job>
       </jobs>
     </stage>
-  <% if @params[:jasmine] %>
-    <stage name="Functionals">
-      <jobs>
-        <job name="Jasmine">
-          <environmentvariables>
-            <variable name="DISPLAY">
-              <value>:100</value>
-            </variable>
-          </environmentvariables>
-          <tasks>
-          <% if @params[:database_required] %>
-            <exec command="/bin/ln">
-              <arg>-sf</arg>
-              <arg>/etc/go_saas/database.yml</arg>
-              <arg>config/database.yml</arg>
-              <runif status="passed" />
-            </exec>
-            <%end%>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:init] %></arg>
-              <runif status="passed" />
-            </exec>
-          <% if @params[:database_required] %>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:create db:migrate</arg>
-              <runif status="passed" />
-            </exec>
-          <%end%>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>
-              <runif status="passed" />
-            </exec>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake --trace jasmine:headless</arg>
-              <runif status="passed" />
-            </exec>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>
-              <runif status="any" />
-            </exec>
-          </tasks>
-        </job>
-      </jobs>
-    </stage>
-  <% end %>
-  <% if @params[:twist] %>
-    <stage name="TwistTests">
-      <jobs>
-        <job name="StartServer">
-          <environmentvariables>
-            <variable name="DISPLAY">
-              <value>:100</value>
-            </variable>
-          </environmentvariables>
-          <tasks>
-          <% if @params[:database_required] %>
-            <exec command="/bin/ln">
-              <arg>-sf</arg>
-              <arg>/etc/go_saas/database.yml</arg>
-              <arg>config/database.yml</arg>
-              <runif status="passed" />
-            </exec>
-            <%end%>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:init] %></arg>
-              <runif status="passed" />
-            </exec>
-          <%if @params[:database_required] %>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate</arg>
-              <runif status="passed" />
-            </exec>
-          <%end%>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>
-              <runif status="passed" />
-            </exec>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg>cp test/twist/src/twist.linux.properties test/twist/src/twist.properties</arg>
-              <runif status="passed" />
-            </exec>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:run_tests</arg>
-              <runif status="passed" />
-            </exec>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:server:stop</arg>
-              <runif status="any" />
-            </exec>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>
-              <runif status="any" />
-            </exec>
-          </tasks>
-        </job>
-      </jobs>
-    </stage>
-  <% end %>
-  <% if @params[:post_build_hook] %>
-    <stage name="PostBuild">
-      <jobs>
-        <job name="PostBuild">
-          <tasks>
-          <% if @params[:database_required] %>
-            <exec command="/bin/ln">
-              <arg>-sf</arg>
-              <arg>/etc/go_saas/database.yml</arg>
-              <arg>config/database.yml</arg>
-              <runif status="passed" />
-            </exec>
-            <%end%>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:init] %></arg>
-              <runif status="passed" />
-            </exec>
-          <% if @params[:database_required] %>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec rake db:drop db:create db:migrate</arg>
-              <runif status="passed" />
-            </exec>
-           <% end%>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:ruby] %> -S bundle exec <%= @params[:post_build_hook] %></arg>
-              <runif status="passed" />
-            </exec>
-          </tasks>
-        </job>
-      </jobs>
-    </stage>
-  <% end %>
+    <% if @params[:jasmine] %>
+      <stage name="Functionals">
+        <jobs>
+          <job name="Jasmine">
+            <environmentvariables>
+              <variable name="DISPLAY">
+                <value>:100</value>
+              </variable>
+            </environmentvariables>
+            <tasks>
+              <% if @params[:database_required] %>
+                <exec command="/bin/ln">
+                  <arg>-sf</arg>
+                  <arg>/etc/go_saas/database.yml</arg>
+                  <arg>config/database.yml</arg>
+                  <runif status="passed" />
+                </exec>
+              <% end %>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:init] %></arg>
+                <runif status="passed" />
+              </exec>
+              <% if @params[:database_required] %>
+                <exec command="bash">
+                  <arg>-c</arg>
+                  <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:create db:migrate</arg>
+                  <runif status="passed" />
+                </exec>
+              <% end %>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:ruby] %> -S bundle exec rake --trace jasmine:headless</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>
+                <runif status="any" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    <% end %>
+    <% if @params[:twist] %>
+      <stage name="TwistTests">
+        <jobs>
+          <job name="StartServer">
+            <environmentvariables>
+              <variable name="DISPLAY">
+                <value>:100</value>
+              </variable>
+            </environmentvariables>
+            <tasks>
+              <% if @params[:database_required] %>
+                <exec command="/bin/ln">
+                  <arg>-sf</arg>
+                  <arg>/etc/go_saas/database.yml</arg>
+                  <arg>config/database.yml</arg>
+                  <runif status="passed" />
+                </exec>
+              <% end %>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:init] %></arg>
+                <runif status="passed" />
+              </exec>
+              <% if @params[:database_required] %>
+                <exec command="bash">
+                  <arg>-c</arg>
+                  <arg><%= @params[:ruby] %> -S bundle exec rake --trace db:drop db:create db:migrate</arg>
+                  <runif status="passed" />
+                </exec>
+              <% end %>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>Xvfb ${DISPLAY} &gt; .zeroci.xvfb.log 2&gt;&amp;1 &amp;</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>cp test/twist/src/twist.linux.properties test/twist/src/twist.properties</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:run_tests</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:ruby] %> -S bundle exec rake --trace twist:server:stop</arg>
+                <runif status="any" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>ps aux | grep Xvfb | grep ${DISPLAY} | grep -v grep | awk '{print $2}' | xargs -I PID kill -9 PID || true</arg>
+                <runif status="any" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    <% end %>
+    <% if @params[:post_build_hook] %>
+      <stage name="PostBuild">
+        <jobs>
+          <job name="PostBuild">
+            <tasks>
+              <% if @params[:database_required] %>
+                <exec command="/bin/ln">
+                  <arg>-sf</arg>
+                  <arg>/etc/go_saas/database.yml</arg>
+                  <arg>config/database.yml</arg>
+                  <runif status="passed" />
+                </exec>
+              <% end %>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:init] %></arg>
+                <runif status="passed" />
+              </exec>
+              <% if @params[:database_required] %>
+                <exec command="bash">
+                  <arg>-c</arg>
+                  <arg><%= @params[:ruby] %> -S bundle exec rake db:drop db:create db:migrate</arg>
+                  <runif status="passed" />
+                </exec>
+              <% end %>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:ruby] %> -S bundle exec <%= @params[:post_build_hook] %></arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    <% end %>
     <% if @params[:heroku_deploy] %>
-    <stage name="HerokuDeployment">
-      <jobs>
-        <job name="HerokuDeployment">
-          <tasks>
-          <% if @params[:database_required] %>
-            <exec command="/bin/ln">
-              <arg>-sf</arg>
-              <arg>/etc/go_saas/database.yml</arg>
-              <arg>config/database.yml</arg>
-              <runif status="passed" />
-            </exec>
-            <%end%>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg><%= @params[:init] %></arg>
-              <runif status="passed" />
-            </exec>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg>~/herokuSetup.sh</arg>
-              <runif status="passed" />
-            </exec>
-            <exec command="bash">
-              <arg>-c</arg>
-              <arg>git push heroku master</arg>
-              <runif status="passed" />
-            </exec>
-          </tasks>
-        </job>
-      </jobs>
-    </stage>
-  <% end %>
+      <stage name="HerokuDeployment">
+        <jobs>
+          <job name="HerokuDeployment">
+            <tasks>
+              <% if @params[:database_required] %>
+                <exec command="/bin/ln">
+                  <arg>-sf</arg>
+                  <arg>/etc/go_saas/database.yml</arg>
+                  <arg>config/database.yml</arg>
+                  <runif status="passed" />
+                </exec>
+              <% end %>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg><%= @params[:init] %></arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>heroku apps | grep '^<%= @params[:heroku_deploy][:app_name] %>$' || heroku create --no-remote <%= @params[:heroku_deploy][:app_name] %> --stack <%= @params[:heroku_deploy][:stack_name] %></arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>heroku config:add BUILDPACK_URL=<%= @params[:heroku_deploy][:build_pack] %> --app <%= @params[:heroku_deploy][:app_name] %></arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>git push git@heroku.com:<%= @params[:heroku_deploy][:app_name] %>.git master</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    <% end %>
   </pipeline>
 </pipelines>

@@ -85,11 +85,11 @@ module GoFigure
           <cruise />
       }
       config = GoConfig.new(:xml => xml)
-      config.set_heroku_deploy
+      config.set_heroku_deploy({:app_name => "MyApp", :build_pack => 'https://github.com/ThoughtWorksInc/build-pack-custom', :stack_name => 'cedar'})
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>~/herokuSetup.sh</arg>}
-      assert config.xml_content =~ %r{<arg>git push heroku master</arg>}
+      assert config.xml_content =~ %r{<arg>heroku apps | grep '^MyApp$' || heroku create --no-remote MyApp --stack cedar --buildpack https://github.com/ThoughtWorksInc/build-pack-custom</arg>}
+      assert config.xml_content =~ %r{<arg>git push git@heroku.com:MyApp.git master</arg>}
     end
 
     def test_should_not_set_the_rspec_pipeline_if_not_configured
