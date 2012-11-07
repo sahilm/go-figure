@@ -288,6 +288,17 @@ module GoFigure
       assert config.xml_content =~ %r{<git autoUpdate="false" url="http://git.example.com/my_project/atlas.git"/>}
     end
 
+    test "should run migrate tasks if db migration is enabled on heroku" do
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+      config = GoConfig.new(:xml => xml)
+      config.set_heroku_deploy({:app_name => "MyApp", :build_pack => 'https://github.com/ThoughtWorksInc/build-pack-custom', :stack_name => 'cedar', :run_db_migrate => true})
+      config.set_ruby('/usr/bin/ruby')
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content =~ %r{<arg>heroku run --app MyApp 'rake db:migrate --trace'</arg>}
+    end
+
     def test_should_set_the_environment_variables
       xml = %Q{<?xml version="1.0" encoding="utf-8"?>
           <cruise />

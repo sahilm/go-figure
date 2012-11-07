@@ -235,6 +235,13 @@
                 <arg>git push git@heroku.com:<%= @params[:heroku_deploy][:app_name] %>.git master</arg>
                 <runif status="passed" />
               </exec>
+              <% if @params[:heroku_deploy][:run_db_migrate] %>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>heroku run --app <%= @params[:heroku_deploy][:app_name] %> 'rake db:migrate --trace'</arg>
+                <runif status="passed" />
+              </exec>
+              <% end %>
             </tasks>
           </job>
         </jobs>
