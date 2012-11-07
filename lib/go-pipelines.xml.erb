@@ -225,11 +225,13 @@
                 <arg>heroku apps | grep '^<%= @params[:heroku_deploy][:app_name] %>$' || heroku create --no-remote <%= @params[:heroku_deploy][:app_name] %> --stack <%= @params[:heroku_deploy][:stack_name] %></arg>
                 <runif status="passed" />
               </exec>
-              <exec command="bash">
-                <arg>-c</arg>
-                <arg>heroku config:add BUILDPACK_URL=<%= @params[:heroku_deploy][:build_pack] %> --app <%= @params[:heroku_deploy][:app_name] %></arg>
-                <runif status="passed" />
-              </exec>
+              <% if @params[:heroku_deploy][:build_pack] %>
+                <exec command="bash">
+                  <arg>-c</arg>
+                  <arg>heroku config:add BUILDPACK_URL=<%= @params[:heroku_deploy][:build_pack] %> --app <%= @params[:heroku_deploy][:app_name] %></arg>
+                  <runif status="passed" />
+                </exec>
+              <% end %>
               <exec command="bash">
                 <arg>-c</arg>
                 <arg>git push git@heroku.com:<%= @params[:heroku_deploy][:app_name] %>.git master</arg>

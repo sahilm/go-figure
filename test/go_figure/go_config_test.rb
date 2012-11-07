@@ -77,7 +77,7 @@ module GoFigure
       config.set_rspec
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace spec</arg>}
+      assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace spec</arg>}
     end
 
     test "should create the heroku deploy stage if configured" do
@@ -85,11 +85,35 @@ module GoFigure
           <cruise />
       }
       config = GoConfig.new(:xml => xml)
-      config.set_heroku_deploy({:app_name => "MyApp", :build_pack => 'https://github.com/ThoughtWorksInc/build-pack-custom', :stack_name => 'cedar'})
+      config.set_heroku_deploy({:app_name => "MyApp", :stack_name => 'cedar'})
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>heroku apps | grep '^MyApp$' || heroku create --no-remote MyApp --stack cedar --buildpack https://github.com/ThoughtWorksInc/build-pack-custom</arg>}
-      assert config.xml_content =~ %r{<arg>git push git@heroku.com:MyApp.git master</arg>}
+      assert config.xml_content.include? %Q{<arg>heroku apps | grep '^MyApp$' || heroku create --no-remote MyApp --stack cedar</arg>}
+      assert config.xml_content.include? %Q{<arg>git push git@heroku.com:MyApp.git master</arg>}
+    end
+
+    test "should add heroku build pack when it is enabled" do
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+      config = GoConfig.new(:xml => xml)
+      config.set_heroku_deploy({:app_name => "MyApp", :stack_name => 'cedar', :build_pack => 'http://github.com/foo/foo-build-pack'})
+      config.set_ruby('/usr/bin/ruby')
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert config.xml_content.include? %Q{<arg>heroku config:add BUILDPACK_URL=http://github.com/foo/foo-build-pack --app MyApp</arg>}
+      assert config.xml_content.include? %Q{<arg>git push git@heroku.com:MyApp.git master</arg>}
+    end
+
+    test "should not add heroku build pack when it is not enabled" do
+      xml = %Q{<?xml version="1.0" encoding="utf-8"?>
+          <cruise />
+      }
+      config = GoConfig.new(:xml => xml)
+      config.set_heroku_deploy({:app_name => "MyApp", :stack_name => 'cedar'})
+      config.set_ruby('/usr/bin/ruby')
+      config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
+      assert_false config.xml_content.include? %Q{<arg>heroku config:add BUILDPACK_URL=http://github.com/foo/foo-build-pack --app MyApp</arg>}
+      assert config.xml_content.include? %Q{<arg>git push git@heroku.com:MyApp.git master</arg>}
     end
 
     def test_should_not_set_the_rspec_pipeline_if_not_configured
@@ -99,7 +123,7 @@ module GoFigure
 
       config = GoConfig.new(:xml => xml)
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content !~ %r{rake spec}
+      assert_false config.xml_content.include? %Q{rake spec}
     end
 
     def test_should_set_the_test_unit_pipeline_if_configured
@@ -111,7 +135,7 @@ module GoFigure
       config.set_test_unit
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>/usr/bin/ruby -S bundle exec rake --trace test</arg>}
+      assert config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake --trace test</arg>}
     end
 
     def test_should_not_set_the_test_unit_pipeline_if_not_configured
@@ -201,9 +225,9 @@ module GoFigure
       config.set_ruby('/usr/bin/ruby')
       config.set_post_build_hook('rm -rf /')
 
-      assert config.xml_content !~ /PostBuildHook/m
-      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rake db:create db:migrate</arg>}
-      assert config.xml_content !~ %r{<arg>/usr/bin/ruby -S bundle exec rm -rf /</arg>}
+      assert_false config.xml_content.include? "PostBuildHook"
+      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rake db:create db:migrate</arg>}
+      assert_false config.xml_content.include? %Q{<arg>/usr/bin/ruby -S bundle exec rm -rf /</arg>}
     end
 
     def assert_agent(agent, agent_node)
@@ -284,8 +308,8 @@ module GoFigure
     def assert_pipeline_template(xml)
       config = GoConfig.new(:xml => xml)
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<pipelines group="defaultGroup">}
-      assert config.xml_content =~ %r{<git autoUpdate="false" url="http://git.example.com/my_project/atlas.git"/>}
+      assert config.xml_content.include? %Q{<pipelines group="defaultGroup">}
+      assert config.xml_content.include? %Q{<git autoUpdate="false" url="http://git.example.com/my_project/atlas.git"/>}
     end
 
     test "should run migrate tasks if db migration is enabled on heroku" do
@@ -296,7 +320,7 @@ module GoFigure
       config.set_heroku_deploy({:app_name => "MyApp", :build_pack => 'https://github.com/ThoughtWorksInc/build-pack-custom', :stack_name => 'cedar', :run_db_migrate => true})
       config.set_ruby('/usr/bin/ruby')
       config.set_pipeline('http://git.example.com/my_project/atlas.git', 'atlas_rails')
-      assert config.xml_content =~ %r{<arg>heroku run --app MyApp 'rake db:migrate --trace'</arg>}
+      assert config.xml_content.include? %Q{<arg>heroku run --app MyApp 'rake db:migrate --trace'</arg>}
     end
 
     def test_should_set_the_environment_variables
