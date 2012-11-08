@@ -207,19 +207,6 @@
         <jobs>
           <job name="HerokuDeployment">
             <tasks>
-              <% if @params[:database_required] %>
-                <exec command="/bin/ln">
-                  <arg>-sf</arg>
-                  <arg>/etc/go_saas/database.yml</arg>
-                  <arg>config/database.yml</arg>
-                  <runif status="passed" />
-                </exec>
-              <% end %>
-              <exec command="bash">
-                <arg>-c</arg>
-                <arg><%= @params[:init] %></arg>
-                <runif status="passed" />
-              </exec>
               <exec command="bash">
                 <arg>-c</arg>
                 <arg>heroku apps | grep '^<%= @params[:heroku_deploy][:app_name] %>$' || heroku create --no-remote <%= @params[:heroku_deploy][:app_name] %> --stack <%= @params[:heroku_deploy][:stack_name] %></arg>
